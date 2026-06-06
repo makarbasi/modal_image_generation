@@ -1,0 +1,236 @@
+<!-- 
+  Smart Wish AI - Frontend Interface 
+  Main entry point for the Generative Studio.
+  Includes Text and Visual Laboratory sections.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Wish AI | Generative Studio</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <main class="app-container">
+        <header>
+            <h1 class="logo">Smart<span>Wish</span></h1>
+            <p class="tagline">Premium AI-Powered Greeting Studio</p>
+        </header>
+
+        <div class="lab-grid">
+            <!-- Text Generation Lab -->
+            <section class="lab-card card animate-in">
+                <div class="card-header">
+                    <div class="icon text-icon">✍️</div>
+                    <div>
+                        <h3>Text Laboratory</h3>
+                        <p class="subtitle">Powered by Gemma 4 E4B</p>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="text-prompt">Message Prompt</label>
+                    <textarea id="text-prompt" placeholder="Describe the message you want..."></textarea>
+                </div>
+                
+                <div class="input-group row-group">
+                    <div class="field-container">
+                        <label for="text-context">Context (Optional)</label>
+                        <input type="text" id="text-context" placeholder="Add specific details...">
+                    </div>
+                    <div class="toggle-container">
+                        <label class="toggle-label" for="variations-toggle">
+                            <input type="checkbox" id="variations-toggle">
+                            <span class="toggle-custom"></span>
+                            <span class="toggle-text">Get 3 Versions</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button id="gen-text-btn" class="primary-btn">
+                    <span class="btn-text">Generate Message</span>
+                    <span class="loader hidden"></span>
+                </button>
+
+                <div id="text-result-container" class="result-area hidden">
+                    <div id="single-output-container">
+                        <div class="content-box" id="text-output"></div>
+                        <button id="copy-btn" class="secondary-btn small">Copy Text</button>
+                    </div>
+                    
+                    <div id="variations-output-container" class="hidden">
+                        <label>Raw Modal Response</label>
+                        <pre class="content-box raw-json" id="raw-output"></pre>
+                    </div>
+
+                    <!-- Sanitization Pipeline Visualization -->
+                    <div id="sanitization-panel" class="sanitization-panel hidden">
+                        <div class="pipeline-header">
+                            <span class="pipeline-icon">🧹</span>
+                            <h4>Sanitization Pipeline</h4>
+                        </div>
+                        <div class="pipeline-flow">
+                            <div class="pipeline-step">
+                                <label>Raw Input</label>
+                                <div class="pipeline-content" id="raw-input-display"></div>
+                            </div>
+                            <div class="pipeline-arrow">→</div>
+                            <div class="pipeline-step">
+                                <label>Sanitized Prompt</label>
+                                <div class="pipeline-content sanitized" id="sanitized-prompt-display"></div>
+                            </div>
+                        </div>
+                        <div class="pipeline-timings" id="pipeline-timings"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Image Generation Lab -->
+            <section class="lab-card card animate-in delay-1">
+                <div class="card-header">
+                    <div class="icon image-icon">🎨</div>
+                    <div>
+                        <h3>Visual Laboratory</h3>
+                        <p class="subtitle">Powered by Flux.2 [klein]</p>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="image-prompt">Visual Prompt</label>
+                    <textarea id="image-prompt" placeholder="Describe the image you want to see..."></textarea>
+                </div>
+
+                <button id="gen-image-btn" class="primary-btn">
+                    <span class="btn-text">Generate Image</span>
+                    <span class="loader hidden"></span>
+                </button>
+
+                <div id="image-result-container" class="result-area image-result-area hidden">
+                    <!-- Image Sanitization Pipeline Visualization -->
+                    <div id="image-sanitization-panel" class="sanitization-panel hidden" style="margin-top: 0; margin-bottom: 2rem;">
+                        <div class="pipeline-header">
+                            <span class="pipeline-icon">🧹</span>
+                            <h4>Image Sanitization Pipeline</h4>
+                        </div>
+                        <div class="pipeline-flow">
+                            <div class="pipeline-step">
+                                <label>Raw Input</label>
+                                <div class="pipeline-content" id="image-raw-input-display"></div>
+                            </div>
+                            <div class="pipeline-arrow">→</div>
+                            <div class="pipeline-step">
+                                <label>Sanitized Prompt</label>
+                                <div class="pipeline-content sanitized" id="image-sanitized-prompt-display"></div>
+                            </div>
+                        </div>
+                        <div class="pipeline-timings" id="image-pipeline-timings"></div>
+                    </div>
+                    
+                    <div id="image-output" class="image-box">
+                        <div class="image-placeholder">
+                            <span class="shimmer"></span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Image Edit Lab -->
+            <section class="lab-card card animate-in delay-2 edit-lab-card">
+                <div class="card-header">
+                    <div class="icon edit-icon">🖌️</div>
+                    <div>
+                        <h3>Image Edit Laboratory</h3>
+                        <p class="subtitle">Powered by Flux.2 [klein] — img2img</p>
+                    </div>
+                </div>
+
+                <div class="edit-layout">
+                    <!-- Left: Inputs -->
+                    <div class="edit-inputs">
+                        <div class="input-group">
+                            <label for="edit-image-upload">Source Image</label>
+                            <div class="upload-zone" id="upload-zone">
+                                <input type="file" id="edit-image-upload" accept="image/png, image/jpeg, image/webp" hidden>
+                                <div class="upload-placeholder" id="upload-placeholder">
+                                    <span class="upload-icon">📁</span>
+                                    <p>Click or drag an image here</p>
+                                    <p class="upload-hint">PNG, JPEG, or WebP</p>
+                                </div>
+                                <img id="edit-source-preview" class="source-preview hidden" alt="Source preview">
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="edit-prompt">Edit Instruction</label>
+                            <textarea id="edit-prompt" placeholder="Describe what you want to change... e.g. 'Make it a watercolor painting' or 'Add snow to the scene'"></textarea>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="strength-slider">
+                                Edit Strength: <span id="strength-value">0.75</span>
+                            </label>
+                            <input type="range" id="strength-slider" min="0.1" max="1.0" step="0.05" value="0.75">
+                            <div class="slider-labels">
+                                <span>Subtle</span>
+                                <span>Dramatic</span>
+                            </div>
+                        </div>
+
+                        <button id="gen-edit-btn" class="primary-btn">
+                            <span class="btn-text">Edit Image</span>
+                            <span class="loader hidden"></span>
+                        </button>
+                    </div>
+
+                    <!-- Right: Result -->
+                    <div class="edit-result">
+                        <div id="edit-result-container" class="result-area image-result-area">
+                            <!-- Edit Sanitization Pipeline Visualization -->
+                            <div id="edit-sanitization-panel" class="sanitization-panel hidden" style="margin-top: 0; margin-bottom: 2rem;">
+                                <div class="pipeline-header">
+                                    <span class="pipeline-icon">🧹</span>
+                                    <h4>Edit Sanitization Pipeline</h4>
+                                </div>
+                                <div class="pipeline-flow">
+                                    <div class="pipeline-step">
+                                        <label>Raw Input</label>
+                                        <div class="pipeline-content" id="edit-raw-input-display"></div>
+                                    </div>
+                                    <div class="pipeline-arrow">→</div>
+                                    <div class="pipeline-step">
+                                        <label>Sanitized Prompt</label>
+                                        <div class="pipeline-content sanitized" id="edit-sanitized-prompt-display"></div>
+                                    </div>
+                                </div>
+                                <div class="pipeline-timings" id="edit-pipeline-timings"></div>
+                            </div>
+                            
+                            <label>Edited Result</label>
+                            <div id="edit-output" class="image-box">
+                                <div class="image-placeholder">
+                                    <span class="shimmer"></span>
+                                    <p style="position:relative; z-index:1; color: var(--text-muted)">
+                                        Your edited image will appear here
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
